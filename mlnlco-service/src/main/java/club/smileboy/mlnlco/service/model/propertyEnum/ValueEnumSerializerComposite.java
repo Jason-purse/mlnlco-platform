@@ -41,7 +41,7 @@ public class ValueEnumSerializerComposite {
      */
     public static void registerModule(ObjectMapper objectMapper) {
         SimpleModule simpleModule = new SimpleModule();
-        serializers(objectMapper);
+        serializers(simpleModule);
 
         objectMapper.registerModule(simpleModule);
     }
