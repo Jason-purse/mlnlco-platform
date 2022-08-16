@@ -3,12 +3,17 @@ package club.smileboy.mlnlco.service.model.propertyEnum;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.type.ReferenceType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,15 +47,18 @@ public interface PropertyEnum<T extends Enum<T> & PropertyEnum<T>> extends Value
     /**
      * 基于 asText 序列化
      */
-    class PropertyEnumSerializer extends StdSerializer<PropertyEnum> {
+    @Slf4j
+    class PropertyEnumSerializer extends StdSerializer<PropertyEnum<?>> {
 
         protected PropertyEnumSerializer() {
-            super(PropertyEnum.class);
+            super(TypeFactory.defaultInstance().constructType(new TypeReference<PropertyEnum<?>>() {
+            }));
         }
 
         @Override
-        public void serialize(PropertyEnum propertyEnum, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        public void serialize(PropertyEnum<?> propertyEnum, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             jsonGenerator.writeString(propertyEnum.asText());
+            log.debug("find propertyEnum, so use PropertyEnumSerializer handle it");
         }
     }
 
@@ -58,7 +66,7 @@ public interface PropertyEnum<T extends Enum<T> & PropertyEnum<T>> extends Value
      * PropertyEnum 反序列化器 ..
      * @param <T> 泛型
      */
-    class PropertyEnumDeserializer<T extends Enum<T> & PropertyEnum<T>> extends StdDeserializer<PropertyEnum<T>> {
+    class PropertyEnumDeserializer<T extends Enum<T> & PropertyEnum<T>> extends StdDeserializer<T> {
 
         private final Class<T> tClass;
         protected PropertyEnumDeserializer(Class<T> tClass) {
@@ -69,7 +77,7 @@ public interface PropertyEnum<T extends Enum<T> & PropertyEnum<T>> extends Value
 
 
         @Override
-        public PropertyEnum<T> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+        public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
             String text = jsonParser.getText();
             return PropertyEnum.of(tClass,text).orElseThrow(() -> ValueInstantiationException.from(jsonParser,"can't find a valid propertyEnum type"));
         }

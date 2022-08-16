@@ -3,12 +3,15 @@ package club.smileboy.mlnlco.service.model.propertyEnum;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,10 +51,12 @@ public interface ValueEnum<T extends Enum<T> & ValueEnum<T>> {
     /**
      * 值序列化
      */
-    class ValueEnumSerializer extends StdSerializer<ValueEnum> {
+    @Slf4j
+    class ValueEnumSerializer extends StdSerializer<ValueEnum<?>> {
 
         protected ValueEnumSerializer() {
-            super(ValueEnum.class);
+            super(TypeFactory.defaultInstance().constructType(new TypeReference<ValueEnum<?>>() {
+            }));
         }
 
         @Override
@@ -59,16 +64,18 @@ public interface ValueEnum<T extends Enum<T> & ValueEnum<T>> {
             if(valueEnum instanceof PropertyEnum) {
                 JsonSerializer<Object> valueSerializer = serializerProvider.findValueSerializer(PropertyEnum.PropertyEnumSerializer.class);
                 valueSerializer.serialize(valueEnum,jsonGenerator,serializerProvider);
+                log.debug("find type is PropertyEnum,so use PropertyEnumSerializer handle it");
             }
             else {
                 // 才直接解析(必然是一个枚举)
                 jsonGenerator.writeString(((Enum<?>) valueEnum).name());
+                log.debug("find type is ValueEnum,so use ValueEnumSerializer handle it");
             }
         }
     }
 
     class ValueEnumDeserializer<T extends Enum<T> & ValueEnum<T>> extends StdDeserializer<ValueEnum<T>> {
-        private Class<T> tClass;
+        private final Class<T> tClass;
         protected ValueEnumDeserializer(Class<T> vc) {
             super(vc);
             this.tClass = vc;

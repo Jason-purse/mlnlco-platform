@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://pixcer.top:3306/mlnlco-platform?characterEncoding=utf8&TimeZone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver

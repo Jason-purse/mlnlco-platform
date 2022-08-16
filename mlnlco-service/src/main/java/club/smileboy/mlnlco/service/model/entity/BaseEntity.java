@@ -36,7 +36,7 @@ public abstract class BaseEntity {
 
     @PrePersist
     protected void prePersist() {
-        Date now = DateUtil.Companion.now();
+        Date now = DateUtil.INSTANCE.now();
         if (createTime == null) {
             createTime = now;
         }

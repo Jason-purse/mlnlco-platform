@@ -26,6 +26,17 @@ sealed class AppSecret {
      */
     abstract fun getSecretAsFullText(): String
 
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hashCode(getSecretAsFullText())
+    }
+
     companion object {
         const val delimiter: String = ":";
 
@@ -61,7 +72,7 @@ sealed class AppSecret {
          * App SecretAttributeConverter
          */
         @Converter(autoApply = true)
-        class AppSecretAttributeConverter : AttributeConverter<AppSecret, String> {
+        public class AppSecretAttributeConverter : AttributeConverter<AppSecret, String> {
             override fun convertToDatabaseColumn(appSecret: AppSecret?): String? {
                 return appSecret?.getSecretAsText();
             }

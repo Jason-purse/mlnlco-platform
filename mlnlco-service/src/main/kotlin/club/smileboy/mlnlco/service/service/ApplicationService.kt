@@ -30,9 +30,10 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
         var findAll: Page<ApplicationEntity> = applicationRepository.findAll(applicationQuery.convert(),pageable)
         if(!findAll.isEmpty) {
             return Optional.of(
-                PageImpl<ApplicationVo>(findAll.content.copyBeanProperties(),pageable,findAll.totalElements)
+                PageImpl(findAll.content.copyBeanProperties(),pageable,findAll.totalElements)
             )
         }
+        return Optional.of(Page.empty(pageable))
     }
 
     override fun findAllByQuery(query: Query): Optional<List<ApplicationVo>> {
