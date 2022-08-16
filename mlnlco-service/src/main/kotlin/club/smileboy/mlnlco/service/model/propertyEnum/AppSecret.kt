@@ -74,7 +74,7 @@ sealed class AppSecret {
         @Converter(autoApply = true)
         public class AppSecretAttributeConverter : AttributeConverter<AppSecret, String> {
             override fun convertToDatabaseColumn(appSecret: AppSecret?): String? {
-                return appSecret?.getSecretAsText();
+                return appSecret?.getSecretAsFullText();
             }
 
             override fun convertToEntityAttribute(value: String?): AppSecret? {
@@ -117,7 +117,9 @@ sealed class AppSecret {
         }
 
         class NormalSecret(value: String) : AppSecret() {
+
             private val secret: String = value;
+
             override fun getSecretType(): AppSecretType {
                 return AppSecretType.NORMAL_SECRET;
             }

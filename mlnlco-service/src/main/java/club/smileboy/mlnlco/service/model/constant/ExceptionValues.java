@@ -1,4 +1,4 @@
-package club.smileboy.mlnlco.service.exception;
+package club.smileboy.mlnlco.service.model.constant;
 
 import club.smileboy.mlnlco.service.model.propertyEnum.ValueEnum;
 import org.springframework.util.Assert;
@@ -15,7 +15,11 @@ public enum ExceptionValues implements ValueEnum<ExceptionValues> {
     BAD_REQUEST(400),
     FORBIDDEN(403),
     UN_AUTHENTICATION(401),
-    SERVER_INTERNAL_ERROR(500);
+    SERVER_INTERNAL_ERROR(500),
+    /**
+     * 不支持异常 ..
+     */
+    UN_SUPPORT_ERROR(600);
 
     ExceptionValues(Integer value) {
         Assert.notNull(value,"error code must not be null !!!");

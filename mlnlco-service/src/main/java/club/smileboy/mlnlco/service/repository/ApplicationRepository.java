@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @time 14:21
  * @Description 应用仓库
  */
-public interface ApplicationRepository extends BaseRepository<ApplicationEntity,String>  , JpaSpecificationExecutor<ApplicationEntity> {
+public interface ApplicationRepository extends BaseRepository<ApplicationEntity,Integer>  , JpaSpecificationExecutor<ApplicationEntity> {
 
 }

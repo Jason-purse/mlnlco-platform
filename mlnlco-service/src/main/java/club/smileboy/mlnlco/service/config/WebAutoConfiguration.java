@@ -1,7 +1,9 @@
 package club.smileboy.mlnlco.service.config;
 
+import club.smileboy.mlnlco.commons.util.JsonUtil;
 import club.smileboy.mlnlco.service.handler.QueryTypeHandleMethodArgumentResolver;
 import club.smileboy.mlnlco.service.model.propertyEnum.ValueEnumSerializerComposite;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -22,6 +24,10 @@ public class WebAutoConfiguration implements WebMvcConfigurer  {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream().filter(converter -> converter instanceof MappingJackson2HttpMessageConverter).findFirst()
-                .ifPresent(action -> ValueEnumSerializerComposite.registerModule(((MappingJackson2HttpMessageConverter) action).getObjectMapper()));
+                .ifPresent(action -> {
+                    ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) action).getObjectMapper();
+                    ValueEnumSerializerComposite.registerModule(objectMapper);
+                    JsonUtil.Companion.registerKotlinSupport(objectMapper);
+                });
     }
 }

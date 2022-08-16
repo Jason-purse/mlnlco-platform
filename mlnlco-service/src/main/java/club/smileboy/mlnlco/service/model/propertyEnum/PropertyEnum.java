@@ -41,7 +41,7 @@ public interface PropertyEnum<T extends Enum<T> & PropertyEnum<T>> extends Value
      */
     static <T extends Enum<T> & PropertyEnum<T>> Optional<T> of(Class<T> tClass, String value) {
         return ValueEnum.listOf(tClass)
-                .map(Arrays::asList).flatMap(list -> list.stream().filter(ele -> ele.asText().equals(value)).findFirst());
+                .map(Arrays::asList).flatMap(list -> list.stream().filter(ele -> ele.asText().equalsIgnoreCase(value)).findFirst());
     }
 
     /**

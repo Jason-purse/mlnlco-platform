@@ -3,17 +3,20 @@ package club.smileboy.mlnlco.service.handler;
 import club.smileboy.mlnlco.commons.util.ArrayUtil;
 import club.smileboy.mlnlco.commons.util.ClassUtil;
 import club.smileboy.mlnlco.service.model.constant.QueryTypeEnum;
+import club.smileboy.mlnlco.service.model.params.Operation;
 import club.smileboy.mlnlco.service.model.params.Query;
 import club.smileboy.mlnlco.service.model.params.annotations.QueryType;
 import club.smileboy.mlnlco.service.model.propertyEnum.ValueEnum;
 import club.smileboy.mlnlco.service.util.RequestUtil;
 import org.hibernate.exception.ConstraintViolationException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyValues;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -24,6 +27,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -36,35 +40,35 @@ public class QueryTypeHandleMethodArgumentResolver implements HandlerMethodArgum
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return Query.class.isAssignableFrom(parameter.getParameterType());
+        return Operation.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
     public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer, @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        QueryType annotation = AnnotationUtils.getAnnotation(parameter.getParameterType(), QueryType.class);
-        Assert.notNull(annotation, "QueryType class must annotated by @QueryType !!!");
-        Assert.hasText(annotation.value(), "@QueryType value attribute must not be null !!!");
-        Assert.notNull(annotation.targetType(),"@QueryType targetType attribute must not be null !!!");
-        if (ValueEnum.of(QueryTypeEnum.class, annotation.value().trim())
-                .isPresent()) {
-            // 如果存在,则判断是否为抽象类,如果为抽象类报错
-            ClassUtil.INSTANCE.ifAbstract(annotation.targetType(),() -> {
-                // 如果为抽象类 报错
-                throw new IllegalArgumentException("@QueryType targetType attribute must not be abstract !!!");
-            });
+        QueryType annotation = getParameterAnnotation(parameter);
 
-            ClassUtil.INSTANCE.ifNoDefaultConstructor(annotation.targetType(),() -> {
-               throw new IllegalArgumentException("@QueryType targetType class must have default constructor !!!");
-            });
+        if(annotation == null) {
+            annotation = getMethodAnnotation(parameter.getMethod());
         }
 
+        if(annotation == null) {
+            Assert.notNull(parameter.getMethod(),"method must not be null !!!");
+            annotation = getHandlerTypeAnnotation(parameter.getMethod().getDeclaringClass());
+        }
+
+        validationAnnotation(annotation);
+
+        Operation operation = BeanUtils.instantiateClass(annotation.targetType());
+        // 校验默认值设置
+        operation.defaultValueValidation();
         // 最后直接返回 ...
-        WebDataBinder binder = binderFactory.createBinder(webRequest, BeanUtils.instantiateClass(annotation.targetType()), Objects.requireNonNull(parameter.getParameterName()));
+        WebDataBinder binder = binderFactory.createBinder(webRequest,operation , Objects.requireNonNull(parameter.getParameterName()));
 
         // 判断请求方式,如果为 Get,从参数上进行构建,否则从输入流中构建 ...
         HttpServletRequest nativeRequest = webRequest.getNativeRequest(HttpServletRequest.class);
         Assert.notNull(nativeRequest,"webRequest not is HttpServletRequest, can't continue process !!!");
+
         if (RequestUtil.INSTANCE.isGetRequest(nativeRequest)) {
             // get 请求不管 请求体 ..
             PropertyValues propertyValues = RequestUtil.INSTANCE.convertPropertyValues(nativeRequest, false, null);
@@ -72,6 +76,7 @@ public class QueryTypeHandleMethodArgumentResolver implements HandlerMethodArgum
         }
         // post request body or params
         else {
+            // 在非Get请求中,(在Get请求中这个参数将被忽略)如果注解主动告诉我们 它从body里面获取 ,我们就不用解析了请求体 ..
             PropertyValues propertyValues = RequestUtil.INSTANCE.convertPropertyValues(nativeRequest, annotation.fromBody(), MediaType.APPLICATION_JSON);
             binder.bind(propertyValues);
         }
@@ -99,5 +104,36 @@ public class QueryTypeHandleMethodArgumentResolver implements HandlerMethodArgum
         }
         // 返回结果
         return binder.getTarget();
+    }
+
+    private void validationAnnotation(QueryType annotation) {
+        Assert.notNull(annotation, "Query Type class must annotated by @QueryType !!!");
+        Assert.hasText(annotation.value(), "@QueryType value attribute must not be null !!!");
+        Assert.notNull(annotation.targetType(),"@QueryType targetType attribute must not be null !!!");
+        if (ValueEnum.of(QueryTypeEnum.class, annotation.value().trim())
+                .isPresent()) {
+            // 如果存在,则判断是否为抽象类,如果为抽象类报错
+            ClassUtil.INSTANCE.ifAbstract(annotation.targetType(),() -> {
+                // 如果为抽象类 报错
+                throw new IllegalArgumentException("@QueryType targetType attribute must not be abstract !!!");
+            });
+
+            ClassUtil.INSTANCE.ifNoDefaultConstructor(annotation.targetType(),() -> {
+                throw new IllegalArgumentException("@QueryType targetType class must have default constructor !!!");
+            });
+        }
+    }
+
+    private QueryType getHandlerTypeAnnotation(Class<?> declaringClass) {
+        return AnnotationUtils.getAnnotation(declaringClass,QueryType.class);
+    }
+
+    private QueryType getMethodAnnotation(Method method) {
+        return AnnotationUtils.getAnnotation(method,QueryType.class);
+    }
+
+    @Nullable
+    private QueryType getParameterAnnotation(MethodParameter parameter) {
+        return parameter.getParameterAnnotation(QueryType.class);
     }
 }

@@ -15,7 +15,7 @@ import lombok.Data;
 @Data
 public class ApplicationDetailVo implements ApplicationVo {
 
-    private String id;
+    private Integer id;
 
     /**
      * app id

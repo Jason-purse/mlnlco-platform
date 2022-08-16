@@ -21,8 +21,7 @@ object RequestUtil {
 
     fun isGetRequest(request: HttpServletRequest): Boolean {
         try {
-            RequestMethod.valueOf(request.method)
-            return true;
+            return RequestMethod.valueOf(request.method) == RequestMethod.GET;
         } catch (e: Exception) {
             // pass
         }
@@ -63,11 +62,13 @@ object RequestUtil {
 
                 toByteArray = outStream.toByteArray()
                 outStream.close()
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
                 throw SystemException()
             }
-            val data: Map<String, Any> = JsonUtil.fromJson(String(toByteArray!!))
+
+            // 目前是默认的 .. 稍后再改
+            val data: Map<String, Any> = JsonUtil.INSTANCE.fromJson(String(toByteArray!!))
             return MutablePropertyValues(data)
         } else {
             return MutablePropertyValues(request.parameterMap)

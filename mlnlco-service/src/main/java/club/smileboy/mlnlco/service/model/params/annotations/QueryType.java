@@ -1,5 +1,7 @@
 package club.smileboy.mlnlco.service.model.params.annotations;
 
+import club.smileboy.mlnlco.service.model.params.Operation;
+import club.smileboy.mlnlco.service.model.params.Param;
 import club.smileboy.mlnlco.service.model.params.Query;
 
 import java.lang.annotation.ElementType;
@@ -26,7 +28,7 @@ public @interface QueryType {
     /**
      * 目标类型
      */
-    Class<? extends Query> targetType();
+    Class<? extends Operation> targetType();
 
     /**
      * 是否从request body上获取

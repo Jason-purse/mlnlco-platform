@@ -27,20 +27,25 @@ interface BaseService<T> {
     /**
      * 删除一个 T 信息
      */
-    fun deleteOneByQuery(param: Param)
+    fun deleteOneByParam(param: Param)
 
     /**
      * 删除 List<T> 信息
      */
-    fun deleteListByQuery(param: Param)
+    fun deleteListByParam(param: Param)
 
     /**
      * 更新一个 T 信息
      */
-    fun updateOneByQuery(param: Param)
+    fun updateOneByParam(param: Param)
 
     /**
      * 更新一堆T 信息
      */
-    fun updateListByQuery(param: Param)
+    fun updateListByParam(param: Param)
+
+    /*
+     * 保存一个 T 信息
+     */
+    fun saveOneByParam(param: Param)
 }
