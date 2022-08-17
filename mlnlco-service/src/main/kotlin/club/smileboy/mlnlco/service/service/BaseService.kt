@@ -27,7 +27,7 @@ interface BaseService<T> {
     /**
      * 删除一个 T 信息
      */
-    fun deleteOneByParam(param: Param)
+    fun deleteOneById(id: Int)
 
     /**
      * 删除 List<T> 信息

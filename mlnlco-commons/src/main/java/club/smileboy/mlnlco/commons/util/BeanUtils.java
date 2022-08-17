@@ -6,10 +6,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;
 import java.util.stream.Collectors;
+
 /**
  * @author FLJ
  * @date 2022/8/15
@@ -24,9 +26,9 @@ public class BeanUtils {
     /**
      * Transforms from the source object. (copy same properties only)
      *
-     * @param source source data
+     * @param source      source data
      * @param targetClass target class must not be null
-     * @param <T> target class type
+     * @param <T>         target class type
      * @return instance with specified type copying from source data; or null if source data is null
      * @throws UnsupportedOperationException if newing target instance failed or copying failed
      */
@@ -44,21 +46,21 @@ public class BeanUtils {
             T targetInstance = targetClass.newInstance();
             // Copy properties
             org.springframework.beans.BeanUtils
-                .copyProperties(source, targetInstance, getNullPropertyNames(source));
+                    .copyProperties(source, targetInstance, getNullPropertyNames(source));
             // Return the target instance
             return targetInstance;
         } catch (Exception e) {
             throw new UnsupportedOperationException(
-                "Failed to new " + targetClass.getName() + " instance or copy properties", e);
+                    "Failed to new " + targetClass.getName() + " instance or copy properties", e);
         }
     }
 
     /**
      * Transforms from source data collection in batch.
      *
-     * @param sources source data collection
+     * @param sources     source data collection
      * @param targetClass target class must not be null
-     * @param <T> target class type
+     * @param <T>         target class type
      * @return target collection transforming from source data collection.
      * @throws UnsupportedOperationException if newing target instance failed or copying failed
      */
@@ -71,8 +73,8 @@ public class BeanUtils {
 
         // Transform in batch
         return sources.stream()
-            .map(source -> transformFrom(source, targetClass))
-            .collect(Collectors.toList());
+                .map(source -> transformFrom(source, targetClass))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -89,7 +91,7 @@ public class BeanUtils {
         // Set non null properties from source properties to target properties
         try {
             org.springframework.beans.BeanUtils
-                .copyProperties(source, target, getNullPropertyNames(source));
+                    .copyProperties(source, target, getNullPropertyNames(source));
         } catch (BeansException e) {
             throw new UnsupportedOperationException("Failed to copy properties", e);
         }
@@ -128,6 +130,14 @@ public class BeanUtils {
             // if property value is equal to null, add it to empty name set
             if (propertyValue == null) {
                 emptyNames.add(propertyName);
+                continue;
+            }
+
+            // 如果 是字符串,但是是 empty,过滤掉
+            if (String.class.isAssignableFrom(propertyDescriptor.getPropertyType())) {
+                if (!StringUtils.hasText(propertyValue.toString())) {
+                    emptyNames.add(propertyName);
+                }
             }
         }
 

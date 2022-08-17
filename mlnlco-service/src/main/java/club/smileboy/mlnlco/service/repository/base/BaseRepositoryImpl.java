@@ -164,4 +164,5 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
             return path.in(this.parameter);
         }
     }
+
 }

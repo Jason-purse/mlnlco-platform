@@ -22,7 +22,7 @@ public class I18nMessageService implements I18nMessageCodeResolver, MessageSourc
 
 
     @Override
-    public Optional<String> resolveMessage(@NotNull String messagePrefix, int code, Locale locale, @Nullable Object[] args) throws IllegalAccessException {
+    public Optional<String> resolveMessage(@NotNull String messagePrefix, String code, Locale locale, @Nullable Object[] args) throws IllegalAccessException {
         if(messageSource == null) {
             throw new IllegalAccessException("current service maybe is not fully initialized !!!");
         }

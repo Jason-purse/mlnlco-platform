@@ -8,7 +8,6 @@ import club.smileboy.mlnlco.service.model.params.Query;
 import club.smileboy.mlnlco.service.model.params.annotations.QueryType;
 import club.smileboy.mlnlco.service.model.propertyEnum.ValueEnum;
 import club.smileboy.mlnlco.service.util.RequestUtil;
-import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyValues;
@@ -27,6 +26,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -60,8 +60,7 @@ public class QueryTypeHandleMethodArgumentResolver implements HandlerMethodArgum
         validationAnnotation(annotation);
 
         Operation operation = BeanUtils.instantiateClass(annotation.targetType());
-        // 校验默认值设置
-        operation.defaultValueValidation();
+
         // 最后直接返回 ...
         WebDataBinder binder = binderFactory.createBinder(webRequest,operation , Objects.requireNonNull(parameter.getParameterName()));
 
@@ -100,8 +99,11 @@ public class QueryTypeHandleMethodArgumentResolver implements HandlerMethodArgum
                 builder.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append("\n");
             }
             // 抛出异常
-            throw new ConstraintViolationException(builder.toString(),null, parameter.getParameterName());
+            throw new ConstraintViolationException(builder.toString(),null);
         }
+
+        // 校验默认值设置
+        operation.defaultValueValidation();
         // 返回结果
         return binder.getTarget();
     }

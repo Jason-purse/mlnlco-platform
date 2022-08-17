@@ -3,6 +3,7 @@ package club.smileboy.mlnlco.service.cache;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -36,8 +37,8 @@ public class SimpleBaseBeanFactoryCacheRegistry implements CacheRegistry<CacheCo
 
     private final Object monitor = new Object();
 
-    @Autowired
-    public void setCacheContainer(List<CacheContainer<?,?>> cacheContainers) {
+    @Autowired(required = false)
+    public void setCacheContainer(List<CacheContainer> cacheContainers) {
        synchronized (monitor) {
            // full lifecycle bean
            for (CacheContainer<?, ?> cacheContainer : cacheContainers) {
@@ -49,7 +50,8 @@ public class SimpleBaseBeanFactoryCacheRegistry implements CacheRegistry<CacheCo
     @Override
     public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         if(applicationContext instanceof GenericApplicationContext) {
-            this.applicationContext = ((GenericApplicationContext) applicationContext);
+            this.applicationContext = (GenericApplicationContext) applicationContext;
+            return ;
         }
         throw new IllegalArgumentException("application must be ConfigurableApplicationContext !!!");
     }

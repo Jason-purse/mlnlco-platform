@@ -1,12 +1,17 @@
 package club.smileboy.mlnlco.service.repository.base;
 
+import io.lettuce.core.StrAlgoArgs;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 
+import javax.persistence.criteria.*;
 import java.util.Collection;
 import java.util.List;
 /**
@@ -45,5 +50,4 @@ public interface BaseRepository<D, I> extends JpaRepository<D, I> {
      * @return number of rows affected
      */
     long deleteByIdIn(@NonNull Collection<I> ids);
-
 }

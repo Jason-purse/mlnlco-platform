@@ -24,7 +24,7 @@ class OptionService : BaseService<OptionEntity> {
         TODO("Not yet implemented")
     }
 
-    override fun deleteOneByParam(param: Param) {
+    override fun deleteOneById(id: Int) {
         TODO("Not yet implemented")
     }
 

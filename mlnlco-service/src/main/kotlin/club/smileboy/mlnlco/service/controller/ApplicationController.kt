@@ -7,6 +7,7 @@ import club.smileboy.mlnlco.service.util.AppResult
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -40,9 +41,19 @@ class ApplicationController(private val applicationService: ApplicationService) 
      * 更新一个应用详情
      */
     @PutMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    @QueryType("application", targetType = ApplicationUpdateParam::class,fromBody = true)
+    @QueryType("application", targetType = ApplicationUpdateParam::class, fromBody = true)
     fun updateAppBy(param: Param): AppResult<*> {
         return applicationService.updateOneByParam(param).let {
+            AppResult.success()
+        }
+    }
+
+    /**
+     * 删除 一个应用服务 ..
+     */
+    @DeleteMapping("{id:\\d+}")
+    fun deleteAppById(@PathVariable("id") id: Int): AppResult<*> {
+        return applicationService.deleteOneById(id).let {
             AppResult.success()
         }
     }

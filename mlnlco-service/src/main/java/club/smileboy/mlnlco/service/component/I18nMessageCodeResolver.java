@@ -22,7 +22,7 @@ public interface I18nMessageCodeResolver {
      * @return 国际化消息
      */
     @NonNull
-    default String resolveMessageForException(int code, Locale locale,@Nullable Object[] args) throws IllegalAccessException {
+    default String resolveMessageForException(String code, Locale locale,@Nullable Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.EXCEPTION.getPrefix(),code,locale,args)
                 .orElseThrow(() -> new SystemException("message code can't resolve !!!"));
     }
@@ -31,7 +31,7 @@ public interface I18nMessageCodeResolver {
      * 同上
      */
     @NonNull
-    default String resolveMessageForException(int code, Locale locale) throws IllegalAccessException {
+    default String resolveMessageForException(String code, Locale locale) throws IllegalAccessException {
         return resolveMessageForException(code,locale,(Object[]) null);
     }
 
@@ -40,7 +40,7 @@ public interface I18nMessageCodeResolver {
      * @param defaultMessage 提供默认值
      */
     @NonNull
-    default String resolveMessageForException(int code, Locale locale,@NonNull String  defaultMessage,@Nullable  Object[] args) throws IllegalAccessException {
+    default String resolveMessageForException(String code, Locale locale,@NonNull String  defaultMessage,@Nullable  Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.EXCEPTION.getPrefix(),code,locale,args).orElse(defaultMessage);
     }
 
@@ -48,21 +48,21 @@ public interface I18nMessageCodeResolver {
      * 同上
      */
     @NonNull
-    default String resolveMessageForException(int code, Locale locale,@NonNull String  defaultMessage) throws IllegalAccessException {
+    default String resolveMessageForException(String code, Locale locale,@NonNull String  defaultMessage) throws IllegalAccessException {
         return resolveMessageForException(code,locale,defaultMessage,null);
     }
 
     /**
      * 同上,但是不一定存在message
      */
-    default Optional<String> resolveOptionalMessageForException(int code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
+    default Optional<String> resolveOptionalMessageForException(String code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.EXCEPTION.getPrefix(), code,locale,args);
     }
 
     /**
      * 同上
      */
-    default Optional<String> resolveOptionalMessageForException(int code, Locale locale) throws IllegalAccessException {
+    default Optional<String> resolveOptionalMessageForException(String code, Locale locale) throws IllegalAccessException {
         return resolveOptionalMessageForException(code,locale,(Object[]) null);
     }
 
@@ -72,12 +72,12 @@ public interface I18nMessageCodeResolver {
      * @return 国际化消息
      */
     @NonNull
-    default String resolveMessageForValidation(int code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
+    default String resolveMessageForValidation(String code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.VALIDATION.getPrefix(), code,locale,args).orElseThrow(() -> new SystemException("message code can't resolve !!!"));
     }
 
     @NonNull
-    default String resolveMessageForValidation(int code, Locale locale) throws IllegalAccessException {
+    default String resolveMessageForValidation(String code, Locale locale) throws IllegalAccessException {
         return resolveMessageForValidation(code,locale,(Object[])null);
     }
 
@@ -87,12 +87,12 @@ public interface I18nMessageCodeResolver {
      * @param defaultMessage 默认消息值 ..
      */
     @NonNull
-    default String resolveMessageForValidation(int code, Locale locale,@NonNull String defaultMessage,@Nullable  Object[] args) throws IllegalAccessException {
+    default String resolveMessageForValidation(String code, Locale locale,@NonNull String defaultMessage,@Nullable  Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.VALIDATION.getPrefix(), code,locale,args).orElse(defaultMessage);
     }
 
     @NonNull
-    default String resolveMessageForValidation(int code, Locale locale,@NonNull String defaultMessage) throws IllegalAccessException {
+    default String resolveMessageForValidation(String code, Locale locale,@NonNull String defaultMessage) throws IllegalAccessException {
         return resolveMessageForValidation(code,locale,defaultMessage,null);
     }
 
@@ -100,11 +100,11 @@ public interface I18nMessageCodeResolver {
      * 同上,但是不一定存在 message
      * @param code code
      */
-    default Optional<String> resolveOptionalMessageForValidation(int code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
+    default Optional<String> resolveOptionalMessageForValidation(String code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException {
         return resolveMessage(I18nMessageResolveType.VALIDATION.getPrefix(), code,locale,args);
     }
 
-    default Optional<String> resolveOptionalMessageForValidation(int code, Locale locale) throws IllegalAccessException {
+    default Optional<String> resolveOptionalMessageForValidation(String code, Locale locale) throws IllegalAccessException {
         return resolveOptionalMessageForValidation(code,locale,null);
     }
 
@@ -116,7 +116,7 @@ public interface I18nMessageCodeResolver {
      * @implNote 需要正确返回是否具有对应的消息,对于不存在的消息前缀,可以采取自定义策略返回 ...
      * @exception IllegalAccessException 如果底层资源还没有初始化好可以返回无效访问异常 ... / 自定义行为 ...
      */
-    Optional<String> resolveMessage(@NonNull String messagePrefix,int code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException;
+    Optional<String> resolveMessage(@NonNull String messagePrefix,String code, Locale locale,@Nullable  Object[] args) throws IllegalAccessException;
 
 
 }

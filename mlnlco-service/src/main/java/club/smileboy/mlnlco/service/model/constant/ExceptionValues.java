@@ -11,24 +11,31 @@ import org.springframework.util.Assert;
  */
 public enum ExceptionValues implements ValueEnum<ExceptionValues> {
 
-    SUCCESS(200),
-    BAD_REQUEST(400),
-    FORBIDDEN(403),
-    UN_AUTHENTICATION(401),
-    SERVER_INTERNAL_ERROR(500),
+    SUCCESS(200,"SUCCESS"),
+    BAD_REQUEST(400,"BAD_REQUEST"),
+    FORBIDDEN(403,"FORBIDDEN"),
+    UN_AUTHENTICATION(401,"UN_AUTHENTICATION"),
+    SERVER_INTERNAL_ERROR(500,"SERVER_INTERNAL_ERROR"),
     /**
      * 不支持异常 ..
      */
-    UN_SUPPORT_ERROR(600);
+    UN_SUPPORT_ERROR(600,"UN_SUPPORT_OPERATION_ERROR");
 
-    ExceptionValues(Integer value) {
+    ExceptionValues(Integer value,String defaultMessage) {
         Assert.notNull(value,"error code must not be null !!!");
         this.code = value;
+        this.defaultMessage  = defaultMessage;
     }
 
     private final Integer code;
 
+    private final String defaultMessage;
+
     public Integer getCode() {
         return code;
+    }
+
+    public String getDefaultMessage() {
+        return defaultMessage;
     }
 }
