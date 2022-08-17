@@ -7,10 +7,8 @@ import club.smileboy.mlnlco.service.model.entity.ApplicationEntity
 import club.smileboy.mlnlco.service.model.params.*
 import club.smileboy.mlnlco.service.model.propertyEnum.AppSecretType
 import club.smileboy.mlnlco.service.repository.ApplicationRepository
-import org.springframework.data.domain.Example
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.Pageable
+import club.smileboy.mlnlco.service.util.PageUtil.Companion.withSort
+import org.springframework.data.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -25,25 +23,31 @@ import java.util.*
 @Service
 class ApplicationService(private val applicationRepository: ApplicationRepository) : BaseService<ApplicationVo> {
 
-
+    /**
+     * 查询所有的应用信息并分页
+     */
     override fun findAllByPageAndQuery(query: Query, pageable: Pageable): Optional<Page<ApplicationVo>> {
         val applicationQuery = query as ApplicationQuery
+
+        // 默认通过sort 排序(时间倒叙)
+        val queryPageable: PageRequest  = pageable.withSort(Sort.by(Sort.Direction.DESC,"updateTime"))
+
         val findAll: Page<ApplicationEntity> = if (!applicationQuery.checkNeedToSpecification()) {
-            applicationRepository.findAll(pageable)
+            applicationRepository.findAll(queryPageable)
         } else {
-            applicationRepository.findAll(applicationQuery.toSpecification(), pageable)
+            applicationRepository.findAll(applicationQuery.toSpecification(), queryPageable)
         }
 
         if (!findAll.isEmpty) {
             return Optional.of(
                 PageImpl(
                     findAll.content.copyBeanProperties(ApplicationDetailVo::class.java),
-                    pageable,
+                    queryPageable,
                     findAll.totalElements
                 )
             )
         }
-        return Optional.of(Page.empty(pageable))
+        return Optional.of(Page.empty(queryPageable))
     }
 
     override fun findAllByQuery(query: Query): Optional<List<ApplicationVo>> {

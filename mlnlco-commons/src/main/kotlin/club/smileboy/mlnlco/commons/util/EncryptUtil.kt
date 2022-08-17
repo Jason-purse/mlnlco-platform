@@ -1,5 +1,6 @@
 package club.smileboy.mlnlco.commons.util
 
+import lombok.extern.slf4j.Slf4j
 import org.springframework.util.Base64Utils
 import java.math.BigInteger
 import java.security.MessageDigest

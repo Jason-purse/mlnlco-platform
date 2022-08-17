@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * @date 2022/8/15
  * @time 16:58
  * @Description 序列化器集合
+ *
+ * 让Spring mvc 或者自定义 objectMapper 能够正确序列化或者反序列化这些值 ....
  */
 public class ValueEnumSerializerComposite {
 

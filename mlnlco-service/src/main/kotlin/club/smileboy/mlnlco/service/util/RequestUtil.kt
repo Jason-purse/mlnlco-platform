@@ -4,11 +4,18 @@ import club.smileboy.mlnlco.commons.util.JsonUtil
 import club.smileboy.mlnlco.service.exception.SystemException
 import org.springframework.beans.MutablePropertyValues
 import org.springframework.beans.PropertyValues
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.context.request.RequestAttributes
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
+import org.springframework.web.context.support.WebApplicationContextUtils
+import org.springframework.web.servlet.support.RequestContextUtils
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 /**
@@ -26,6 +33,18 @@ object RequestUtil {
             // pass
         }
         return false;
+    }
+
+    /*
+     * 从LocaleContextHolder中获取
+     */
+   fun getRequestLocale(): Locale {
+       return LocaleContextHolder.getLocale()
+   }
+
+
+    fun getRequestLocaleBy(request: HttpServletRequest): Locale {
+        return RequestContextUtils.getLocale(request)
     }
 
     /**

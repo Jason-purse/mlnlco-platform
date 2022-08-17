@@ -64,7 +64,7 @@ sealed class AppSecret {
                 if (it.size < 2) {
                     return Optional.empty()
                 }
-                return of(it[0], appSecretStr.substring(it[0].length))
+                return of(it[0], appSecretStr.substring(it[0].length + delimiter.length))
             }
         }
 

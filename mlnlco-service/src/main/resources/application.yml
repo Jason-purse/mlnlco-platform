@@ -4,11 +4,17 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 120000
 
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
+#
+#  profile 开启 ....
+#  profiles:
+#    active: dev
 logging:
   level:
     org.hibernate: INFO
