@@ -5,6 +5,8 @@ import club.smileboy.mlnlco.commons.util.CollectionUtil.copyBeanProperties
 import club.smileboy.mlnlco.service.exception.AppUnSupportedOperationException
 import club.smileboy.mlnlco.service.model.entity.AppUserEntity
 import club.smileboy.mlnlco.service.model.params.*
+import club.smileboy.mlnlco.service.model.property.Email
+import club.smileboy.mlnlco.service.model.property.Phone
 import club.smileboy.mlnlco.service.model.propertyEnum.UserOrigin
 import club.smileboy.mlnlco.service.repository.UserRepository
 import org.springframework.dao.DataAccessException
@@ -44,7 +46,10 @@ class UserService(private val userRepository: UserRepository) :
             // 表示存在 ..
             return Optional.of(
                 PageImpl(
-                    content.copyBeanProperties(AppUserDetailVo::class.java),
+                    content.copyBeanProperties(AppUserDetailVo::class.java) {
+                        email = Email(it.email)
+                        phone = Phone(it.phone)
+                    },
                     pageable,
                     totalElements
                 )
@@ -57,7 +62,9 @@ class UserService(private val userRepository: UserRepository) :
         TODO("Not yet implemented")
     }
 
-
+    /**
+     * 通过id 删除一个 ...
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun deleteOneById(id: Int) {
         try {
@@ -81,60 +88,66 @@ class UserService(private val userRepository: UserRepository) :
             if (isEmpty) {
                 throw AppUnSupportedOperationException.ofEnableI18n("user.empty.update")
             }
-
+            // 在和当前更新的数据冲突时,查询是否还有违反规则的 对象是否存在 ..
             if (checkUserLegality(get(), userUpdateParam.username, userUpdateParam.origin, true)) {
                 // 在 不和需要更新的值相同时,则查找是否存在 同名 user info ...
                 if (userUpdateParam.checkNeedToSpecification()) {
-                    userRepository.findOne(userUpdateParam.toSpecification()).run {
+                    userRepository.count(userUpdateParam.toSpecification()).run {
                         if (!isEmpty) {
-                            checkUserLegality(get(), userUpdateParam.username, userUpdateParam.origin, false)
+                            throw AppUnSupportedOperationException.ofEnableI18n("user.name_origin")
                         }
                     }
                 }
             }
+            BeanUtils.updateProperties(userUpdateParam, get())
             // 否则直接更新
-            userRepository.save(BeanUtils.transformFrom(userUpdateParam, AppUserEntity::class.java)!!.apply {
+            userRepository.save(get().apply {
                 if (StringUtils.hasText(userUpdateParam.phone.info)) {
                     phone = userUpdateParam.phone.info
                 }
             })
         }
-}
-
-/**
- * 不合法,为true,否则为false
- */
-private fun checkUserLegality(user: AppUserEntity, username: String, origin: UserOrigin, isSelf: Boolean): Boolean {
-    if (!user.username.equals(username) || !user.originType.equals(origin)) {
-        if (!isSelf) {
-            throw AppUnSupportedOperationException.ofEnableI18n("user.name_origin")
-        }
-        return true;
     }
 
-    return false;
-}
-
-override fun updateListByParam(param: Param) {
-    TODO("Not yet implemented")
-}
-
-@Transactional(propagation = Propagation.REQUIRES_NEW)
-override fun saveOneByParam(param: Param) {
-    val userSaveParam = param as UserSaveParam
-    if (userSaveParam.checkNeedToSpecification()) {
-        userRepository.findOne(userSaveParam.toSpecification()).run {
-            if (!isEmpty) {
-                // 判断,如果当前这个信息存在,则抛出异常
+    /**
+     * 不合法,为true,否则为false
+     */
+    private fun checkUserLegality(
+        user: AppUserEntity,
+        username: String,
+        origin: UserOrigin,
+        isSelf: Boolean = false
+    ): Boolean {
+        if (!user.username.equals(username) || !user.originType.equals(origin)) {
+            if (!isSelf) {
                 throw AppUnSupportedOperationException.ofEnableI18n("user.name_origin")
             }
-            userRepository.save(BeanUtils.transformFrom(userSaveParam, AppUserEntity::class.java)!!.apply {
-                if (StringUtils.hasText(userSaveParam.phone.info)) {
-                    // 电话信息单独处理 ...
-                    phone = userSaveParam.phone.info
+            return true
+        }
+
+        return false
+    }
+
+    override fun updateListByParam(param: Param) {
+        TODO("Not yet implemented")
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    override fun saveOneByParam(param: Param) {
+        val userSaveParam = param as UserSaveParam
+        if (userSaveParam.checkNeedToSpecification()) {
+            userRepository.findOne(userSaveParam.toSpecification()).run {
+                if (!isEmpty) {
+                    // 判断,如果当前这个信息存在,则抛出异常
+                    throw AppUnSupportedOperationException.ofEnableI18n("user.name_origin")
                 }
-            })
+                userRepository.save(BeanUtils.transformFrom(userSaveParam, AppUserEntity::class.java)!!.apply {
+                    if (StringUtils.hasText(userSaveParam.phone.info)) {
+                        // 电话信息单独处理 ...
+                        phone = userSaveParam.phone.info
+                    }
+                })
+            }
         }
     }
-}
 }

@@ -9,6 +9,7 @@ import club.smileboy.mlnlco.service.model.propertyEnum.UserOrigin;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -40,7 +41,7 @@ public class UserSaveParam implements Param, Query {
 
     private String password;
 
-    @NotBlank(message = "sex must not be null !!!")
+    @javax.validation.constraints.NotNull(message = "sex must not be null !!!")
     private SexType sex;
 
 
@@ -71,24 +72,22 @@ public class UserSaveParam implements Param, Query {
     public void defaultValueValidation() {
         if (originType == null) {
             // 仅当 username / password 传递了,否则 不允许保存 ...
-            if (password != null) {
+            if (StringUtils.hasText(password)) {
                 originType = UserOrigin.NATIVE_REGISTER;
             }
-
-            if(password == null) {
-                throw new IllegalArgumentException("origin type must not be null !!!");
+            else {
+                throw new IllegalArgumentException("origin type must not be null,because password is empty !!!");
             }
         }
 
-        if(password == null) {
+        if (password == null) {
             password = "";
         }
 
         if (phone != null) {
             // 邮箱格式校验
             phone.validationValidity();
-        }
-        else {
+        } else {
             phone = Phone.EMPTY;
         }
 
@@ -97,10 +96,11 @@ public class UserSaveParam implements Param, Query {
         }
     }
 
+    @NotNull
     @Override
     public Specification<AppUserEntity> toSpecification() {
         // 用户名 和 originType 必须唯一
-        return new UserUniqueQuerySpecification(username,originType);
+        return new UserUniqueQuerySpecification(username, originType);
     }
 
     @Override
@@ -115,15 +115,17 @@ public class UserSaveParam implements Param, Query {
 
         private final String username;
         private final UserOrigin origin;
-        public UserUniqueQuerySpecification(String username,UserOrigin origin) {
+
+        public UserUniqueQuerySpecification(String username, UserOrigin origin) {
             this.username = username;
             this.origin = origin;
         }
+
         @Override
         public Predicate toPredicate(Root<AppUserEntity> root, @NotNull CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 
             return criteriaBuilder.and(criteriaBuilder.equal(root.get(AppUserEntity_.username), username),
-                    criteriaBuilder.equal(root.get(AppUserEntity_.originType), origin.asText()));
+                    criteriaBuilder.equal(root.get(AppUserEntity_.originType), origin));
         }
     }
 }

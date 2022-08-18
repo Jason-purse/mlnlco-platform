@@ -1,5 +1,6 @@
 package club.smileboy.mlnlco.service.model.params;
 
+import club.smileboy.mlnlco.service.exception.AppUnSupportedOperationException;
 import club.smileboy.mlnlco.service.model.constant.QueryTypeEnum;
 import club.smileboy.mlnlco.service.model.entity.AppUserEntity;
 import club.smileboy.mlnlco.service.model.property.Phone;
@@ -21,7 +22,7 @@ import java.util.Date;
  * @Description 用户更新参数
  */
 @Data
-public class UserUpdateParam implements Param ,Query{
+public class UserUpdateParam implements Param ,Query {
     @Override
     public String getEntityType() {
         return QueryTypeEnum.USER.name();
@@ -86,6 +87,11 @@ public class UserUpdateParam implements Param ,Query{
 
         if(password == null) {
             password = "";
+        }
+        else {
+            if(origin != UserOrigin.NATIVE_REGISTER) {
+                throw AppUnSupportedOperationException.Companion.ofEnableI18n("user.password_origin");
+            }
         }
     }
 }

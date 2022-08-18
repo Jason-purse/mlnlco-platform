@@ -32,7 +32,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "app_user",indexes = {
-        @Index(name = "username_unique_Key",unique = true,columnList = "username,originType")
+        @Index(name = "username_unique_Key",unique = true,columnList = "username,origin_type")
 })
 @ToString
 @Data
@@ -55,7 +55,7 @@ public class AppUserEntity extends BaseEntity {
 
 
     @Column(nullable = false,columnDefinition = "varchar(20)")
-    @ColumnDefault("MAN")
+    @ColumnDefault("'MAN'")
     private SexType sex;
 
 
@@ -66,7 +66,7 @@ public class AppUserEntity extends BaseEntity {
      * 来源类型
      */
     @Column(name = "origin_type",columnDefinition = "varchar(25)")
-    @ColumnDefault("NATIVE_REGISTER")
+    @ColumnDefault("'NATIVE_REGISTER'")
     private UserOrigin originType;
 
     /**

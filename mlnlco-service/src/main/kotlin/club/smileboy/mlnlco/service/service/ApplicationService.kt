@@ -90,7 +90,6 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
                         throw AppUnSupportedOperationException.ofEnableI18n("app.name_sub")
                     }
                 }
-
                 BeanUtils.updateProperties(applicationUpdateParam, get())
                 applicationRepository.save(get())
             } else {

@@ -1,5 +1,6 @@
 package club.smileboy.mlnlco.service.model.params;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -16,6 +17,7 @@ public interface Operation {
      * 获取需要操作的 信息类型
      * @return
      */
+    @JsonIgnore
     public String getEntityType();
 
     /**
