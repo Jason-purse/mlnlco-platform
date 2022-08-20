@@ -1,6 +1,7 @@
 package club.smileboy.mlnlco.service.model.params;
 
 import club.smileboy.mlnlco.service.model.constant.AuthorizationType;
+import club.smileboy.mlnlco.service.model.propertyEnum.UserOrigin;
 import lombok.Setter;
 
 /**
@@ -18,8 +19,17 @@ public abstract class AbstractAuthorizeParam implements AuthorizeParam {
 
     private AuthorizationType authorizationType;
 
+    private UserOrigin origin;
+
+    private Boolean fullPlatFormToken;
+
+    /**
+     * app id
+     */
+    private String appId;
+
     @Override
-    public String getUserName() {
+    public String getUsername() {
         return username;
     }
 
@@ -31,5 +41,20 @@ public abstract class AbstractAuthorizeParam implements AuthorizeParam {
     @Override
     public AuthorizationType getAuthorizeType() {
         return authorizationType;
+    }
+
+    @Override
+    public String getAppId() {
+        return appId;
+    }
+
+    @Override
+    public UserOrigin getOrigin() {
+        return origin;
+    }
+
+    @Override
+    public Boolean isFullPlatFormToken() {
+        return fullPlatFormToken;
     }
 }

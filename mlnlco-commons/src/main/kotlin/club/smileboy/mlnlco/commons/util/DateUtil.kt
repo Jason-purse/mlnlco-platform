@@ -15,4 +15,8 @@ object DateUtil {
     fun now(): Date {
         return Date()
     }
+
+    fun plus(millis: Long): Long {
+        return now().toInstant().plusMillis(millis).toEpochMilli()
+    }
 }

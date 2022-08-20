@@ -96,5 +96,6 @@ public class AppUserEntity extends BaseEntity {
         if(nickname == null) {
             nickname = "anonymous_user";
         }
+        super.prePersist();
     }
 }

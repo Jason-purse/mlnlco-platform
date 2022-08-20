@@ -2,7 +2,10 @@ package club.smileboy.mlnlco.service.repository;
 
 import club.smileboy.mlnlco.service.model.entity.ApplicationEntity;
 import club.smileboy.mlnlco.service.repository.base.BaseRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import java.util.List;
 
 /**
  * @author FLJ
@@ -12,4 +15,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface ApplicationRepository extends BaseRepository<ApplicationEntity,Integer>  , JpaSpecificationExecutor<ApplicationEntity> {
 
+    @NotNull
+    List<SubOnly> findAllApplicationSub();
+
+    interface SubOnly {
+        String getSub();
+    }
 }
+

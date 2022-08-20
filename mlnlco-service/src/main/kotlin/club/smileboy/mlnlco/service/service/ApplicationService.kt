@@ -86,7 +86,7 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
                 // 需要判断是否具有指定的sub / appName 被使用了 ...
                 // 首先判断自己是否相等(如果相等,则不继续判断,否则判断是否存在对应的名称 / sub 被占用)
                 if (checkAppLegality(get(), applicationUpdateParam.appName, applicationUpdateParam.sub, true)) {
-                    if(applicationRepository.count(applicationUpdateParam.toSpecification()) > 0) {
+                    if (applicationRepository.count(applicationUpdateParam.toSpecification()) > 0) {
                         throw AppUnSupportedOperationException.ofEnableI18n("app.name_sub")
                     }
                 }
@@ -136,7 +136,7 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
     ): Boolean {
 
         if (it.appName.equals(appName)) {
-            if(!isSelf) {
+            if (!isSelf) {
                 throw AppUnSupportedOperationException.ofEnableI18n("app.name")
             }
 
@@ -144,7 +144,7 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
             return true;
         }
         if (it.sub.equals(sub)) {
-            if(!isSelf) {
+            if (!isSelf) {
                 throw AppUnSupportedOperationException.ofEnableI18n("app.sub")
             }
             return true;
@@ -152,5 +152,30 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
 
         // 表示不冲突 ...
         return false;
+    }
+
+    /**
+     * fina a application detail
+     */
+    fun findOneByAppId(appId: String): ApplicationDetailVo {
+        return applicationRepository.findOne(Example.of(ApplicationEntity().apply { this.appId = appId })).run {
+            if (isEmpty) {
+                throw AppUnSupportedOperationException.ofEnableI18n("authorize.appid.empty")
+            }
+            BeanUtils.transformFrom(get(), ApplicationDetailVo::class.java)!!
+        }
+    }
+
+    /**
+     * 查询所有应用的 sub信息
+     */
+    fun findAllApplicationSub(): List<String> {
+        return applicationRepository.findAllApplicationSub().run {
+            if (isNotEmpty()) {
+                copyBeanProperties(String::class.java)
+            } else {
+                emptyList()
+            }
+        }
     }
 }

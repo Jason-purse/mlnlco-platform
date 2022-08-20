@@ -2,6 +2,7 @@ package club.smileboy.mlnlco.service.advice;
 
 import club.smileboy.mlnlco.service.component.I18nMessageService;
 import club.smileboy.mlnlco.service.exception.AbstractI18nException;
+import club.smileboy.mlnlco.service.exception.AppGenericI18nException;
 import club.smileboy.mlnlco.service.exception.SystemException;
 import club.smileboy.mlnlco.service.model.constant.ExceptionValues;
 import club.smileboy.mlnlco.service.util.AppResult;
@@ -30,10 +31,9 @@ public class AppControllerAdvice {
      */
     @ExceptionHandler(SystemException.class)
     public AppResult<?> handleSystemException(SystemException systemException) {
-        if(systemException.getCause() != null) {
+        if (systemException.getCause() != null) {
             systemException.getCause().printStackTrace();
-        }
-        else {
+        } else {
             systemException.printStackTrace();
         }
         return AppResult.Companion.error(ExceptionValues.SERVER_INTERNAL_ERROR.getCode(), ExceptionValues.SERVER_INTERNAL_ERROR.name());
@@ -52,6 +52,7 @@ public class AppControllerAdvice {
 
     /**
      * 直接处理 参数验证异常
+     *
      * @param constraintViolationException 参数验证异常
      * @return 响应结果
      */
@@ -63,6 +64,7 @@ public class AppControllerAdvice {
 
     /**
      * 处理不支持操作异常
+     *
      * @param e e
      * @return 响应结果
      */
@@ -74,6 +76,7 @@ public class AppControllerAdvice {
 
     /**
      * 处理运行时异常
+     *
      * @param e e
      * @return 返回消息结果
      */
@@ -96,7 +99,8 @@ public class AppControllerAdvice {
 
             if (e.isNeededI18n()) {
                 return AppResult.Companion.error(ExceptionValues.BAD_REQUEST.getCode(), messageService.resolveMessageForValidation(
-                        e.getCode(),RequestUtil.INSTANCE.getRequestLocale(),e.getDefaultMessage()
+                        e.getCode(), RequestUtil.INSTANCE.getRequestLocale(), e.getDefaultMessage(),
+                        e instanceof AppGenericI18nException ? ((AppGenericI18nException) e).getArgs() : null
                 ));
             }
 

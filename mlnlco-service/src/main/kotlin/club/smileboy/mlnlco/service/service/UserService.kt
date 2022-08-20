@@ -4,12 +4,14 @@ import club.smileboy.mlnlco.commons.util.BeanUtils
 import club.smileboy.mlnlco.commons.util.CollectionUtil.copyBeanProperties
 import club.smileboy.mlnlco.service.exception.AppUnSupportedOperationException
 import club.smileboy.mlnlco.service.model.entity.AppUserEntity
+import club.smileboy.mlnlco.service.model.entity.ApplicationEntity
 import club.smileboy.mlnlco.service.model.params.*
 import club.smileboy.mlnlco.service.model.property.Email
 import club.smileboy.mlnlco.service.model.property.Phone
 import club.smileboy.mlnlco.service.model.propertyEnum.UserOrigin
 import club.smileboy.mlnlco.service.repository.UserRepository
 import org.springframework.dao.DataAccessException
+import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -149,5 +151,21 @@ class UserService(private val userRepository: UserRepository) :
                 })
             }
         }
+    }
+
+    /**
+     * 获取一个用户信息,通过 origin 和 username ...
+     */
+    fun findOneByUserOriginAndUsername(userOrigin: UserOrigin, username: String): AppUserDetailVo {
+        return userRepository.findOne(Example.of(AppUserEntity().apply {
+            this.username = username;
+            this.originType = userOrigin
+        }))
+            .run {
+                if (isPresent) {
+                    return@run BeanUtils.transformFrom(get(), AppUserDetailVo::class.java)!!
+                }
+                throw AppUnSupportedOperationException.ofEnableI18n("user.empty");
+            }
     }
 }

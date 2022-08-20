@@ -1,6 +1,7 @@
 package club.smileboy.mlnlco.service.model.params;
 
 import lombok.Data;
+import lombok.Setter;
 
 /**
  * @author JASONJ
@@ -8,7 +9,7 @@ import lombok.Data;
  * @time 22:05
  * @description jwt 授权vo
  **/
-@Data
+@Setter
 public class JWTAuthorizeVo implements AuthorizeVo {
     @Override
     public String getEntityType() {

@@ -1,10 +1,13 @@
 package club.smileboy.mlnlco.service.model.params;
 
+import club.smileboy.mlnlco.commons.util.JWTUtil;
 import club.smileboy.mlnlco.service.model.propertyEnum.AppSecret;
 import club.smileboy.mlnlco.service.model.propertyEnum.AppSecretType;
 import club.smileboy.mlnlco.service.model.propertyEnum.ApplicationType;
 import club.smileboy.mlnlco.service.model.propertyEnum.IcoType;
+import com.auth0.jwt.JWTCreator;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author FLJ
@@ -56,5 +59,4 @@ public class ApplicationDetailVo implements ApplicationVo {
      * 应用密钥类型
      */
     private AppSecretType appSecretType;
-
 }
