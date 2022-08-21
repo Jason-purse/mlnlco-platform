@@ -1,7 +1,9 @@
 package club.smileboy.mlnlco.service.service
 
 import club.smileboy.mlnlco.commons.util.BeanUtils
+import club.smileboy.mlnlco.commons.util.CollectionUtil
 import club.smileboy.mlnlco.commons.util.CollectionUtil.copyBeanProperties
+import club.smileboy.mlnlco.commons.util.CollectionUtil.mapTo
 import club.smileboy.mlnlco.commons.util.UuidUtil
 import club.smileboy.mlnlco.service.exception.AppUnSupportedOperationException
 import club.smileboy.mlnlco.service.model.entity.ApplicationEntity
@@ -170,9 +172,9 @@ class ApplicationService(private val applicationRepository: ApplicationRepositor
      * 查询所有应用的 sub信息
      */
     fun findAllApplicationSub(): List<String> {
-        return applicationRepository.findAllApplicationSub().run {
+        return applicationRepository.findAll().run {
             if (isNotEmpty()) {
-                copyBeanProperties(String::class.java)
+                mapTo { it.sub }
             } else {
                 emptyList()
             }
